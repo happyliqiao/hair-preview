@@ -33,6 +33,23 @@ miniprogram-skeleton/
 
 > 模拟器没有摄像头，所以「实时画面 + 人脸叠加」要**真机预览**才能看到：点工具栏「预览」用手机扫码，授权摄像头后，对脸即可看到发型形状 + 发色实时叠加。
 
+## 一·五、新机器 / 在家开发：从 Git 克隆后的搭建清单
+
+仓库地址：https://github.com/happyliqiao/hair-preview （Private，需登录）
+
+1. **克隆**（私有仓库会要求登录）：
+   ```powershell
+   git clone https://github.com/happyliqiao/hair-preview.git
+   ```
+   登录方式：首次 clone 会弹 **Git Credential Manager 浏览器授权**（推荐）；或用 **Personal Access Token** 当密码。
+2. **安装微信开发者工具**，「导入项目」选克隆出来的 `hair-preview` 文件夹。
+3. **AppID**：`project.config.json` 里已含 `wx25da4f25bec93130`，用**同一个微信账号**登录开发者工具即可，否则会提示无权限。
+4. **云开发环境**：`app.js` 的 `env` 为空（默认环境）。云环境绑在 AppID 上，同一账号可直接选到；没建过就点「云开发」新建。
+5. **云函数依赖**：`node_modules` 不随仓库提交。部署前在各云函数目录 `npm install`，或让工具上传时自动安装。
+6. **本地私有配置**：`project.private.config.json` 被 `.gitignore` 忽略，工具会自动重新生成本地编译设置，无需处理。
+
+**双机协作习惯**：开工先 `git pull`，收工 `git add -A && git commit -m "..." && git push`，避免两头冲突。
+
 ## 二、已能直接看到的东西（无需任何账号）
 
 - 完整 5 屏界面与交互（内置 4 款发型 × 9 种发色）。
