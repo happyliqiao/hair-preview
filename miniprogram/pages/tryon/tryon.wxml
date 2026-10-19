@@ -1,0 +1,63 @@
+<view class="page">
+  <!-- 主链路：VKSession WebGL 画布；降级链路：camera 组件 -->
+  <canvas wx:if="{{!fallback}}" type="webgl" id="arCanvas" class="stage"></canvas>
+  <camera wx:else device-position="front" flash="off" frame-size="medium" class="stage"></camera>
+
+  <!-- 叠加画布：发型/发色绘制在这层，覆盖整个画面 -->
+  <canvas type="2d" id="overlayCanvas" class="overlay"></canvas>
+
+  <!-- 截图用隐藏 2D canvas -->
+  <canvas type="2d" id="captureCanvas" class="capture-canvas"></canvas>
+
+  <!-- 引导提示 -->
+  <view class="guide" wx:if="{{!faceDetected}}">请正对屏幕，保持光线充足</view>
+
+  <!-- 顶部栏 -->
+  <view class="topbar">
+    <view class="back" bindtap="onBack">‹</view>
+    <view class="title">✨ 试戴中</view>
+    <view class="tag" wx:if="{{!fallback}}">实时 AR</view>
+  </view>
+
+  <!-- 底部面板 -->
+  <view class="panel">
+    <view class="row-label">发型</view>
+    <scroll-view scroll-x class="hs-row" enhanced show-scrollbar="{{false}}">
+      <view
+        wx:for="{{hairstyles}}" wx:key="_id"
+        class="hs-item {{currentHairstyleId === item._id ? 'on' : ''}}"
+        data-id="{{item._id}}" bindtap="onPickHairstyle">
+        <view class="thumb">{{item.emoji}}</view>
+        <text class="nm">{{item.name}}</text>
+      </view>
+    </scroll-view>
+
+    <view class="row-label">发色</view>
+    <view class="color-row">
+      <view
+        wx:for="{{colors}}" wx:key="_id"
+        class="swatch {{currentColorId === item._id ? 'on' : ''}}"
+        style="background: {{item.hex}}"
+        data-id="{{item._id}}" bindtap="onPickColor"></view>
+    </view>
+
+    <button class="btn-primary capture" loading="{{generating}}" bindtap="onCapture">
+      {{generating ? '生成中…' : '拍照生成效果图'}}
+    </button>
+  </view>
+
+  <!-- 结果弹层 -->
+  <view class="result-mask" wx:if="{{result}}">
+    <view class="result-card">
+      <view class="result-title">你的试戴效果<text wx:if="{{demo}}" class="demo-badge">演示</text></view>
+      <view class="cmp">
+        <view class="cmp-box"><text class="cmp-lab">原图</text><image src="{{result.before}}" mode="aspectFit"></image></view>
+        <view class="cmp-box"><text class="cmp-lab">效果图</text><image src="{{result.after}}" mode="aspectFit"></image></view>
+      </view>
+      <view wx:if="{{demo}}" class="demo-tip">当前为演示模式：仅在照片上叠加所选发型/发色；接入云开发与 AI 后显示真实效果。</view>
+      <button class="btn-primary" bindtap="onSave">💾 保存到相册</button>
+      <button class="btn-line" open-type="share">🔗 分享给好友</button>
+      <view class="btn-text" bindtap="onRetry">↺ 再试一次</view>
+    </view>
+  </view>
+</view>

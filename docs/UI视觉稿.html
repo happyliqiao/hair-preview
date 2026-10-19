@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>发型/发色试戴小程序 · 高保真视觉稿</title>
+<style>
+  :root {
+    --primary: #6C4CF1;
+    --primary2: #5A8BFF;
+    --accent: #FF8A5C;
+    --gold: #F5B84B;
+    --dark: #15151E;
+    --light: #F7F6FB;
+    --text: #1C1C28;
+    --sub: #8A8F9C;
+    --line: #ECECF2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #ECEBF3; color: var(--text); padding: 48px 24px 80px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  .page-title { font-size: 30px; font-weight: 800; letter-spacing: .5px; }
+  .page-sub { color: var(--sub); margin-top: 8px; font-size: 15px; }
+
+  /* 设计系统 */
+  .section-title { font-size: 20px; font-weight: 700; margin: 44px 0 18px; display: flex; align-items: center; gap: 10px; }
+  .section-title::before { content: ""; width: 4px; height: 20px; background: linear-gradient(var(--primary), var(--primary2)); border-radius: 2px; }
+  .sys-card { background: #fff; border-radius: 20px; padding: 24px; display: flex; flex-wrap: wrap; gap: 28px; }
+  .swatches { display: flex; gap: 16px; flex-wrap: wrap; }
+  .sw { width: 72px; text-align: center; }
+  .sw .dot { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }
+  .sw .nm { font-size: 12px; color: var(--sub); }
+  .type-scale { display: flex; flex-direction: column; gap: 12px; }
+  .type-scale .t1 { font-size: 30px; font-weight: 800; }
+  .type-scale .t2 { font-size: 20px; font-weight: 700; }
+  .type-scale .t3 { font-size: 15px; font-weight: 600; }
+  .type-scale .t4 { font-size: 12px; color: var(--sub); }
+
+  /* 手机画廊 */
+  .gallery { display: flex; flex-wrap: wrap; gap: 32px; }
+  .phone {
+    width: 300px; border-radius: 30px; overflow: hidden; position: relative;
+    background: #fff; box-shadow: 0 16px 48px rgba(20,20,40,.16); border: 7px solid #191922;
+  }
+  .phone .label { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 20; background: rgba(0,0,0,.45); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; }
+  .screen { height: 600px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+  .sb { height: 26px; flex: 0 0 auto; }
+
+  /* 首页 */
+  #s-home { background: linear-gradient(165deg, #FFFFFF 0%, #F1EBFF 55%, #E7E0FB 100%); padding: 0 24px; align-items: center; justify-content: center; }
+  .logo { font-size: 12px; letter-spacing: 3px; color: #A79CD1; font-weight: 700; margin-bottom: 26px; }
+  #s-home h1 { font-size: 27px; line-height: 1.35; text-align: center; margin-bottom: 8px; }
+  #s-home .sub { font-size: 13px; color: var(--sub); text-align: center; line-height: 1.6; margin-bottom: 22px; }
+  .hero { width: 150px; margin-bottom: 20px; }
+  .cta { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary2)); color: #fff; border: 0; border-radius: 18px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 26px rgba(108,76,241,.35); }
+  #s-home .hint { font-size: 11px; color: #B0B5C0; text-align: center; margin-top: 14px; }
+
+  /* 授权 */
+  #s-auth { padding: 0 22px; }
+  #s-auth h2 { font-size: 19px; margin: 26px 0 6px; }
+  .perm { display: flex; gap: 14px; align-items: center; padding: 15px; border: 1px solid var(--line); border-radius: 16px; margin: 14px 0; }
+  .perm .ico { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--light); }
+  .perm .t { font-size: 14px; font-weight: 700; }
+  .perm .d { font-size: 11px; color: var(--sub); margin-top: 2px; }
+  .usage { font-size: 11px; color: var(--sub); line-height: 1.7; background: var(--light); padding: 12px 14px; border-radius: 14px; margin: 6px 0 22px; }
+  .auth-btns { display: flex; gap: 12px; margin-top: auto; margin-bottom: 24px; }
+  .b-ghost { flex: 1; padding: 14px; border: 1px solid #DCDCE4; border-radius: 16px; background: #fff; color: #6A707C; font-size: 14px; cursor: pointer; }
+  .b-solid { flex: 1.4; padding: 14px; border: 0; border-radius: 16px; background: var(--primary); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+  /* 试戴 */
+  #s-tryon { background: var(--dark); }
+  .topbar { height: 46px; display: flex; align-items: center; gap: 8px; padding: 0 16px; color: #fff; flex: 0 0 auto; background: var(--dark); }
+  .topbar .back { font-size: 20px; cursor: pointer; color: #fff; }
+  .topbar .title { font-size: 15px; font-weight: 700; }
+  .topbar .tag { margin-left: auto; font-size: 10px; color: #9FD0FF; background: rgba(90,139,255,.18); padding: 3px 8px; border-radius: 14px; }
+  .stage { flex: 1; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 38%, #2B3040, #15151E); position: relative; }
+  .stage .guide { position: absolute; top: 10px; font-size: 11px; color: rgba(255,255,255,.7); }
+  .face { width: 168px; }
+  .panel { background: #fff; border-radius: 22px 22px 0 0; padding: 14px 16px 18px; flex: 0 0 auto; }
+  .rl { font-size: 11px; color: var(--sub); margin: 2px 0 8px; font-weight: 600; }
+  .hs { display: flex; gap: 10px; overflow: hidden; margin-bottom: 14px; }
+  .hs-item { text-align: center; }
+  .hs-item .th { width: 52px; height: 52px; border-radius: 14px; background: var(--light); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid transparent; }
+  .hs-item.on .th { border-color: var(--primary); background: #EFEAFF; }
+  .hs-item .nm { font-size: 10px; color: var(--sub); margin-top: 4px; }
+  .cr { display: flex; gap: 11px; flex-wrap: wrap; margin-bottom: 14px; }
+  .swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; box-shadow: 0 0 0 1.5px #DCDCE4; transition: box-shadow .15s; }
+  .swatch.on { box-shadow: 0 0 0 2.5px var(--primary); }
+  .cap { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary2)); color: #fff; border: 0; border-radius: 16px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; }
+
+  /* 生成中 */
+  #s-gen { align-items: center; justify-content: center; }
+  .spinner { width: 46px; height: 46px; border-radius: 50%; border: 4px solid var(--line); border-top-color: var(--primary); animation: spin 1s linear infinite; margin-bottom: 20px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #s-gen .t { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  #s-gen .d { font-size: 12px; color: var(--sub); }
+  .bar { width: 180px; height: 6px; background: var(--line); border-radius: 3px; margin-top: 18px; overflow: hidden; }
+  .bar i { display: block; width: 70%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary2)); border-radius: 3px; animation: load 1.2s ease-in-out infinite; }
+  @keyframes load { 0%{margin-left:-70%} 100%{margin-left:100%} }
+
+  /* 结果 */
+  #s-result { padding: 0 20px; }
+  #s-result h2 { font-size: 18px; margin: 24px 0 16px; }
+  .cmp { display: flex; gap: 12px; margin-bottom: 20px; }
+  .cmp-box { flex: 1; border-radius: 16px; overflow: hidden; background: var(--light); text-align: center; padding: 8px 8px 10px; border: 1px solid var(--line); }
+  .cmp-box .lab { font-size: 11px; color: var(--sub); margin-bottom: 6px; }
+  .cmp-box .face { width: 110px; }
+  .btn-a { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary2)); color: #fff; border: 0; border-radius: 14px; padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn-b { width: 100%; margin-top: 10px; border: 1px solid #DCDCE4; background: #fff; border-radius: 14px; padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text); }
+  .btn-c { margin-top: 18px; text-align: center; color: var(--sub); font-size: 13px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-title">发型 / 发色试戴 · 高保真视觉稿</div>
+  <div class="page-sub">品牌色方案（靛紫 + 珊瑚橙 + 金色）· 5 个核心页面 · 圆角卡片风格</div>
+
+  <div class="section-title">设计系统 Design System</div>
+  <div class="sys-card">
+    <div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:12px">色彩 Color</div>
+      <div class="swatches">
+        <div class="sw"><div class="dot" style="background:#6C4CF1"></div><div class="nm">Primary 靛紫</div></div>
+        <div class="sw"><div class="dot" style="background:#5A8BFF"></div><div class="nm">Primary 2</div></div>
+        <div class="sw"><div class="dot" style="background:#FF8A5C"></div><div class="nm">Accent 珊瑚橙</div></div>
+        <div class="sw"><div class="dot" style="background:#F5B84B"></div><div class="nm">Gold 金色</div></div>
+        <div class="sw"><div class="dot" style="background:#15151E"></div><div class="nm">Dark 背景</div></div>
+        <div class="sw"><div class="dot" style="background:#F7F6FB"></div><div class="nm">Light 背景</div></div>
+        <div class="sw"><div class="dot" style="background:#1C1C28"></div><div class="nm">Text 主文字</div></div>
+        <div class="sw"><div class="dot" style="background:#8A8F9C"></div><div class="nm">Text 次文字</div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:12px">字体 Typography</div>
+      <div class="type-scale">
+        <div class="t1">大标题 30px / 800</div>
+        <div class="t2">页面标题 20px / 700</div>
+        <div class="t3">正文 / 按钮 15px / 600</div>
+        <div class="t4">辅助说明 12px / 400</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">页面视觉稿 Screens</div>
+  <div class="gallery">
+
+    <!-- ① 首页 -->
+    <div class="phone"><div class="label">① 首页</div><div class="screen" id="s-home">
+      <div class="sb"></div>
+      <div class="logo">HAIR PREVIEW · 试戴</div>
+      <svg class="hero" viewBox="0 0 200 200">
+        <defs><linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5A3E8A"/><stop offset="1" stop-color="#3A2860"/></linearGradient></defs>
+        <path d="M48 112 C48 60 74 44 100 44 C126 44 152 60 152 112 C152 140 142 168 134 176 C140 156 146 128 100 128 C54 128 60 156 66 176 C58 168 48 140 48 112 Z" fill="url(#h1)"/>
+        <path d="M70 96 C76 76 92 66 100 66 C108 66 124 76 130 96 C120 92 80 92 70 96 Z" fill="rgba(255,255,255,.18)"/>
+        <ellipse cx="100" cy="120" rx="50" ry="58" fill="#F6CDA3"/>
+        <ellipse cx="100" cy="118" rx="7" ry="4" fill="#E8A98C"/>
+        <circle cx="83" cy="116" r="3.6" fill="#3A2E28"/><circle cx="117" cy="116" r="3.6" fill="#3A2E28"/>
+        <path d="M93 140 Q100 147 107 140" stroke="#D07B5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="80" cy="130" r="4" fill="#F3B1A0" opacity=".55"/><circle cx="120" cy="130" r="4" fill="#F3B1A0" opacity=".55"/>
+      </svg>
+      <h1>一秒预览<br>你的新发型 & 发色</h1>
+      <div class="sub">前置摄像头实时试戴<br>拍照后 AI 生成高清效果图</div>
+      <button class="cta">开始试戴 →</button>
+      <div class="hint">使用前需授权摄像头</div>
+    </div></div>
+
+    <!-- ② 授权 -->
+    <div class="phone"><div class="label">② 授权</div><div class="screen" id="s-auth">
+      <div class="sb"></div>
+      <h2>需要以下权限</h2>
+      <div class="perm"><div class="ico">📷</div><div><div class="t">摄像头</div><div class="d">用于拍摄你的面部试戴画面</div></div></div>
+      <div class="perm"><div class="ico">😀</div><div><div class="t">人脸信息</div><div class="d">仅用于本地试戴，不上传</div></div></div>
+      <div class="usage">📄 用途说明：你的人脸照片仅用于生成试戴效果图，生成完成后原图将立即删除，请放心使用。</div>
+      <div class="auth-btns"><button class="b-ghost">拒绝</button><button class="b-solid">同意并授权</button></div>
+    </div></div>
+
+    <!-- ③ 试戴 -->
+    <div class="phone"><div class="label">③ 试戴（核心）</div><div class="screen" id="s-tryon">
+      <div class="topbar"><span class="back">‹</span><span class="title">✨ 试戴中</span><span class="tag">实时 AR</span></div>
+      <div class="stage">
+        <div class="guide">请正对屏幕，保持光线充足</div>
+        <svg class="face" viewBox="0 0 200 200">
+          <defs><linearGradient id="h2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8A5A2B"/><stop offset="1" stop-color="#6A4220"/></linearGradient></defs>
+          <path id="hairshape" d="M48 112 C48 60 74 44 100 44 C126 44 152 60 152 112 C152 140 142 168 134 176 C140 156 146 128 100 128 C54 128 60 156 66 176 C58 168 48 140 48 112 Z" fill="url(#h2)"/>
+          <path d="M70 96 C76 76 92 66 100 66 C108 66 124 76 130 96 C120 92 80 92 70 96 Z" fill="rgba(255,255,255,.16)"/>
+          <ellipse cx="100" cy="120" rx="50" ry="58" fill="#F6CDA3"/>
+          <ellipse cx="100" cy="118" rx="7" ry="4" fill="#E8A98C"/>
+          <circle cx="83" cy="116" r="3.6" fill="#3A2E28"/><circle cx="117" cy="116" r="3.6" fill="#3A2E28"/>
+          <path d="M93 140 Q100 147 107 140" stroke="#D07B5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle cx="80" cy="130" r="4" fill="#F3B1A0" opacity=".55"/><circle cx="120" cy="130" r="4" fill="#F3B1A0" opacity=".55"/>
+        </svg>
+      </div>
+      <div class="panel">
+        <div class="rl">发型</div>
+        <div class="hs">
+          <div class="hs-item on"><div class="th">💇‍♀️</div><div class="nm">短发</div></div>
+          <div class="hs-item"><div class="th">💁‍♀️</div><div class="nm">长发</div></div>
+          <div class="hs-item"><div class="th">👩‍🦱</div><div class="nm">卷发</div></div>
+          <div class="hs-item"><div class="th">👩‍🦲</div><div class="nm">清爽</div></div>
+        </div>
+        <div class="rl">发色</div>
+        <div class="cr" id="colorRow"></div>
+        <button class="cap">拍照生成效果图</button>
+      </div>
+    </div></div>
+
+    <!-- ④ 生成中 -->
+    <div class="phone"><div class="label">④ 生成中</div><div class="screen" id="s-gen">
+      <div class="spinner"></div>
+      <div class="t">正在生成效果图…</div>
+      <div class="d">通常几秒 ~ 十几秒</div>
+      <div class="bar"><i></i></div>
+    </div></div>
+
+    <!-- ⑤ 结果 -->
+    <div class="phone"><div class="label">⑤ 结果</div><div class="screen" id="s-result">
+      <div class="sb"></div>
+      <h2>你的试戴效果</h2>
+      <div class="cmp">
+        <div class="cmp-box"><div class="lab">原图</div>
+          <svg class="face" viewBox="0 0 200 200"><ellipse cx="100" cy="120" rx="50" ry="58" fill="#F6CDA3"/><ellipse cx="100" cy="118" rx="7" ry="4" fill="#E8A98C"/><circle cx="83" cy="116" r="3.6" fill="#3A2E28"/><circle cx="117" cy="116" r="3.6" fill="#3A2E28"/><path d="M93 140 Q100 147 107 140" stroke="#D07B5C" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cmp-box"><div class="lab">效果图</div>
+          <svg class="face" viewBox="0 0 200 200">
+            <defs><linearGradient id="h3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8A5A2B"/><stop offset="1" stop-color="#6A4220"/></linearGradient></defs>
+            <path d="M48 112 C48 60 74 44 100 44 C126 44 152 60 152 112 C152 140 142 168 134 176 C140 156 146 128 100 128 C54 128 60 156 66 176 C58 168 48 140 48 112 Z" fill="url(#h3)"/>
+            <ellipse cx="100" cy="120" rx="50" ry="58" fill="#F6CDA3"/><ellipse cx="100" cy="118" rx="7" ry="4" fill="#E8A98C"/><circle cx="83" cy="116" r="3.6" fill="#3A2E28"/><circle cx="117" cy="116" r="3.6" fill="#3A2E28"/><path d="M93 140 Q100 147 107 140" stroke="#D07B5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+      <button class="btn-a">💾 保存到相册</button>
+      <button class="btn-b">🔗 分享给好友</button>
+      <div class="btn-c">↺ 再试一次</div>
+    </div></div>
+
+  </div>
+</div>
+
+<script>
+  const COLORS = ['#1a1a1a','#4a2c1a','#8A5A2B','#6b3f23','#c9a24b','#9a8f7a','#5c6b7a','#7a2030','#d98aa0'];
+  const row = document.getElementById('colorRow');
+  COLORS.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'swatch' + (i === 2 ? ' on' : '');
+    d.style.background = c;
+    d.onclick = () => {
+      document.querySelectorAll('#colorRow .swatch').forEach(s => s.classList.remove('on'));
+      d.classList.add('on');
+      const g = document.getElementById('h2');
+      if (g) { g.setAttribute('stop-color', c); }
+    };
+    row.appendChild(d);
+  });
+</script>
+</body>
+</html>

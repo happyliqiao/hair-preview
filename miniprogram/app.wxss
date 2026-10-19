@@ -1,0 +1,35 @@
+/* 全局样式 */
+page {
+  --primary: #6C4CF1;
+  --accent: #FF8A5C;
+  --gold: #F5B84B;
+  --bg-dark: #15151E;
+  --bg-light: #F7F6FB;
+  --text-main: #1C1C28;
+  --text-sub: #8A8F9C;
+  background: var(--bg-light);
+  color: var(--text-main);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  height: 100%;
+}
+
+view, text, button, image, canvas, camera {
+  box-sizing: border-box;
+}
+
+/* 通用按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, #6C4CF1, #5A8BFF);
+  color: #fff;
+  border-radius: 28rpx;
+  font-weight: 600;
+  border: none;
+}
+.btn-primary::after { border: none; }
+
+/* 通用卡片 */
+.card {
+  background: #fff;
+  border-radius: 32rpx;
+  box-shadow: 0 8rpx 32rpx rgba(28, 28, 40, 0.06);
+}

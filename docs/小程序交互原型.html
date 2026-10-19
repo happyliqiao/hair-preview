@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>发型/发色试戴小程序 · 交互原型</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #2b2f3a;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px 12px; color: #1f2430;
+  }
+  .note { color: #9aa3b2; font-size: 13px; margin-bottom: 14px; text-align: center; }
+  .phone {
+    width: 360px; max-width: 94vw; height: 720px; background: #fff;
+    border-radius: 34px; overflow: hidden; position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45); border: 8px solid #14161c;
+  }
+  .screen { position: absolute; inset: 0; display: none; flex-direction: column; background: #fff; }
+  .screen.active { display: flex; }
+  .statusbar { height: 30px; flex: 0 0 auto; background: inherit; }
+  .scroll { flex: 1; overflow: hidden; }
+
+  /* ---------- 首页 ---------- */
+  #home { background: linear-gradient(160deg, #fff 0%, #f3ecff 100%); align-items: center; justify-content: center; padding: 40px 28px; }
+  #home .brand { font-size: 14px; color: #8a7aa8; letter-spacing: 2px; margin-bottom: 44px; }
+  #home h1 { font-size: 30px; line-height: 1.35; text-align: center; margin-bottom: 10px; }
+  #home .sub { font-size: 15px; color: #7a7f8c; text-align: center; margin-bottom: 60px; }
+  .btn-primary {
+    width: 100%; padding: 16px; border: 0; border-radius: 16px; cursor: pointer;
+    background: linear-gradient(135deg, #7c5cff, #5a8bff); color: #fff; font-size: 17px; font-weight: 600;
+    box-shadow: 0 8px 20px rgba(122,92,255,.35);
+  }
+  .btn-primary:active { transform: scale(.98); }
+  #home .hint { margin-top: 16px; font-size: 12px; color: #a2a7b3; text-align: center; }
+
+  /* ---------- 授权 ---------- */
+  #auth { padding: 24px 22px; }
+  #auth h2 { font-size: 20px; margin: 10px 0 6px; }
+  #auth .perm-list { margin: 26px 0 10px; }
+  #auth .perm { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid #ececf2; border-radius: 14px; margin-bottom: 12px; }
+  #auth .perm .ico { font-size: 24px; }
+  #auth .perm .t { font-weight: 600; font-size: 15px; }
+  #auth .perm .d { font-size: 12px; color: #8b909c; margin-top: 2px; }
+  #auth .usage { font-size: 12px; color: #8b909c; line-height: 1.6; background: #f7f7fb; padding: 12px 14px; border-radius: 12px; margin-bottom: 24px; }
+  .btn-row { display: flex; gap: 12px; margin-top: auto; }
+  .btn-ghost { flex: 1; padding: 15px; border: 1px solid #dcdce4; border-radius: 16px; background: #fff; color: #6a707c; font-size: 15px; cursor: pointer; }
+  .btn-solid { flex: 1.4; padding: 15px; border: 0; border-radius: 16px; background: #7c5cff; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+
+  /* ---------- 试戴页 ---------- */
+  #tryon { background: #14161c; }
+  #tryon .topbar { height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 16px; color: #fff; background: #14161c; flex: 0 0 auto; }
+  #tryon .topbar .back { cursor: pointer; font-size: 18px; }
+  #tryon .topbar .title { font-size: 16px; font-weight: 600; }
+  #tryon .topbar .tag { margin-left: auto; font-size: 11px; color: #9fd0ff; background: rgba(90,139,255,.18); padding: 3px 8px; border-radius: 20px; }
+  #tryon .stage { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 40%, #2c3140, #14161c); overflow: hidden; }
+  #tryon .guide { position: absolute; top: 12px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,.75); font-size: 12px; }
+  #tryon .face-wrap { width: 210px; }
+  #tryon .panel { background: #fff; border-radius: 24px 24px 0 0; padding: 14px 16px 20px; flex: 0 0 auto; }
+  .panel .row-label { font-size: 13px; color: #6a707c; margin: 4px 0 8px; }
+  .hs-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+  .hs-item { flex: 0 0 auto; text-align: center; cursor: pointer; }
+  .hs-item .thumb { width: 58px; height: 58px; border-radius: 14px; background: #f1eef8; display: flex; align-items: center; justify-content: center; font-size: 26px; border: 2px solid transparent; }
+  .hs-item.on .thumb { border-color: #7c5cff; background: #efeaff; }
+  .hs-item .nm { font-size: 11px; color: #6a707c; margin-top: 4px; }
+  .color-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .swatch { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; box-shadow: 0 0 0 1.5px #dcdce4; }
+  .swatch.on { box-shadow: 0 0 0 2.5px #7c5cff; }
+
+  /* ---------- 生成中 ---------- */
+  #generating { align-items: center; justify-content: center; background: #fff; }
+  .spinner { width: 54px; height: 54px; border-radius: 50%; border: 4px solid #ececf2; border-top-color: #7c5cff; animation: spin 1s linear infinite; margin-bottom: 24px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #generating .t { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+  #generating .d { font-size: 13px; color: #8b909c; }
+
+  /* ---------- 结果页 ---------- */
+  #result { padding: 24px 20px; }
+  #result h2 { font-size: 19px; margin: 8px 0 18px; }
+  .cmp { display: flex; gap: 12px; margin-bottom: 22px; }
+  .cmp .box { flex: 1; border-radius: 16px; overflow: hidden; background: #f7f7fb; text-align: center; padding: 8px 8px 10px; border: 1px solid #ececf2; }
+  .cmp .box .lab { font-size: 12px; color: #8b909c; margin-bottom: 6px; }
+  .cmp .box .face-wrap { width: 120px; margin: 0 auto; }
+  .action-list { display: flex; flex-direction: column; gap: 12px; }
+  .btn-line { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid #dcdce4; background: #fff; font-size: 15px; font-weight: 600; cursor: pointer; color: #1f2430; }
+  .btn-line.accent { background: linear-gradient(135deg, #7c5cff, #5a8bff); color: #fff; border: 0; }
+  .btn-text { margin-top: 14px; text-align: center; color: #7a7f8c; font-size: 14px; cursor: pointer; }
+</style>
+</head>
+<body>
+  <div class="note">发型 / 发色试戴小程序 · 可点击交互原型（点击按钮切换页面，试戴页可切发型/发色）</div>
+  <div class="phone">
+
+    <!-- ① 首页 -->
+    <div class="screen active" id="home">
+      <div class="statusbar"></div>
+      <div class="brand">HAIR PREVIEW · 试戴</div>
+      <h1>一秒预览<br>你的新发型 & 发色</h1>
+      <div class="sub">前置摄像头实时试戴<br>拍照后 AI 生成高清效果图</div>
+      <button class="btn-primary" onclick="go('auth')">开始试戴 →</button>
+      <div class="hint">使用前需授权摄像头</div>
+    </div>
+
+    <!-- ② 授权 -->
+    <div class="screen" id="auth">
+      <div class="statusbar"></div>
+      <h2>需要以下权限</h2>
+      <div class="perm-list">
+        <div class="perm"><span class="ico">📷</span><div><div class="t">摄像头</div><div class="d">用于拍摄你的面部试戴画面</div></div></div>
+        <div class="perm"><span class="ico">😀</span><div><div class="t">人脸信息</div><div class="d">仅用于本地试戴，不上传</div></div></div>
+      </div>
+      <div class="usage">📄 用途说明：你的人脸照片仅用于生成试戴效果图，生成完成后原图将立即删除，请放心使用。</div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="go('home')">拒绝</button>
+        <button class="btn-solid" onclick="go('tryon')">同意并授权</button>
+      </div>
+    </div>
+
+    <!-- ③ 试戴页 -->
+    <div class="screen" id="tryon">
+      <div class="topbar">
+        <span class="back" onclick="go('home')">‹</span>
+        <span class="title">✨ 试戴中</span>
+        <span class="tag">实时 AR</span>
+      </div>
+      <div class="stage">
+        <div class="guide">请正对屏幕，保持光线充足</div>
+        <div class="face-wrap">
+          <svg viewBox="0 0 200 200" width="100%" id="faceSvg">
+            <!-- 头发 -->
+            <path id="hair" d="M46 112 C46 60 74 44 100 44 C126 44 154 60 154 112 C152 100 134 94 100 94 C66 94 48 100 46 112 Z" fill="#4a2c1a"/>
+            <!-- 发色色罩 -->
+            <path id="tint" d="M42 110 C42 56 72 40 100 40 C128 40 158 56 158 110 C158 150 148 172 138 180 C144 156 150 128 100 128 C50 128 56 156 62 180 C52 172 42 150 42 110 Z" fill="#8A5A2B" opacity="0.28"/>
+            <!-- 脸 -->
+            <ellipse cx="100" cy="120" rx="52" ry="60" fill="#f4c9a0"/>
+            <!-- 五官 -->
+            <circle cx="82" cy="115" r="4" fill="#3a2e28"/>
+            <circle cx="118" cy="115" r="4" fill="#3a2e28"/>
+            <path d="M92 140 Q100 148 108 140" stroke="#c07a5b" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <ellipse cx="100" cy="88" rx="7" ry="4" fill="#e6a98b"/>
+          </svg>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="row-label">发型（横向滑动）</div>
+        <div class="hs-row" id="hsRow">
+          <div class="hs-item on" data-d="M46 112 C46 60 74 44 100 44 C126 44 154 60 154 112 C152 100 134 94 100 94 C66 94 48 100 46 112 Z" onclick="pickHs(this)"><div class="thumb">💇‍♀️</div><div class="nm">短发</div></div>
+          <div class="hs-item" data-d="M46 112 C46 60 74 44 100 44 C126 44 154 60 154 112 C154 150 144 172 136 178 C142 156 148 130 100 130 C52 130 58 156 64 178 C56 172 46 150 46 112 Z" onclick="pickHs(this)"><div class="thumb">💁‍♀️</div><div class="nm">长发</div></div>
+          <div class="hs-item" data-d="M50 112 C50 74 72 58 100 58 C128 58 150 74 150 112 C148 104 132 100 100 100 C68 100 52 104 50 112 Z" onclick="pickHs(this)"><div class="thumb">👩‍🦲</div><div class="nm">短发清爽</div></div>
+          <div class="hs-item" data-d="M45 110 C40 70 58 40 100 40 C142 40 160 70 155 110 C150 92 134 86 100 86 C66 86 50 92 45 110 Z" onclick="pickHs(this)"><div class="thumb">👩‍🦱</div><div class="nm">卷发</div></div>
+        </div>
+        <div class="row-label" style="margin-top:14px">发色</div>
+        <div class="color-row" id="colorRow"></div>
+        <button class="btn-primary" onclick="go('generating')">拍照生成效果图</button>
+      </div>
+    </div>
+
+    <!-- ④ 生成中 -->
+    <div class="screen" id="generating">
+      <div class="spinner"></div>
+      <div class="t">正在生成效果图…</div>
+      <div class="d">通常几秒 ~ 十几秒</div>
+    </div>
+
+    <!-- ⑤ 结果页 -->
+    <div class="screen" id="result">
+      <div class="statusbar"></div>
+      <h2>你的试戴效果</h2>
+      <div class="cmp">
+        <div class="box"><div class="lab">原图</div><div class="face-wrap">
+          <svg viewBox="0 0 200 200" width="100%"><ellipse cx="100" cy="120" rx="52" ry="60" fill="#f4c9a0"/><circle cx="82" cy="115" r="4" fill="#3a2e28"/><circle cx="118" cy="115" r="4" fill="#3a2e28"/><path d="M92 140 Q100 148 108 140" stroke="#c07a5b" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div></div>
+        <div class="box"><div class="lab">效果图</div><div class="face-wrap">
+          <svg viewBox="0 0 200 200" width="100%" id="resultSvg">
+            <path id="rhair" d="M46 112 C46 60 74 44 100 44 C126 44 154 60 154 112 C152 100 134 94 100 94 C66 94 48 100 46 112 Z" fill="#4a2c1a"/>
+            <path id="rtint" d="M42 110 C42 56 72 40 100 40 C128 40 158 56 158 110 C158 150 148 172 138 180 C144 156 150 128 100 128 C50 128 56 156 62 180 C52 172 42 150 42 110 Z" fill="#8A5A2B" opacity="0.28"/>
+            <ellipse cx="100" cy="120" rx="52" ry="60" fill="#f4c9a0"/>
+            <circle cx="82" cy="115" r="4" fill="#3a2e28"/><circle cx="118" cy="115" r="4" fill="#3a2e28"/>
+            <path d="M92 140 Q100 148 108 140" stroke="#c07a5b" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div></div>
+      </div>
+      <div class="action-list">
+        <button class="btn-line accent" onclick="toast('已保存到相册 📷')">💾 保存到相册</button>
+        <button class="btn-line" onclick="toast('已调起分享 🔗')">🔗 分享给好友</button>
+      </div>
+      <div class="btn-text" onclick="go('tryon')">↺ 再试一次</div>
+    </div>
+
+  </div>
+
+<script>
+  const COLORS = [
+    ['#1a1a1a','黑色'], ['#4a2c1a','深棕'], ['#8A5A2B','焦糖棕'], ['#6b3f23','栗棕'],
+    ['#c9a24b','金色'], ['#9a8f7a','亚麻灰'], ['#5c6b7a','雾蓝'], ['#7a2030','酒红'], ['#d98aa0','粉棕']
+  ];
+
+  const colorRow = document.getElementById('colorRow');
+  COLORS.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'swatch' + (i === 2 ? ' on' : '');
+    d.style.background = c[0];
+    d.title = c[1];
+    d.onclick = () => pickColor(d, c[0]);
+    colorRow.appendChild(d);
+  });
+
+  function pickColor(el, hex) {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('on'));
+    el.classList.add('on');
+    document.getElementById('hair').setAttribute('fill', hex);
+    document.getElementById('tint').setAttribute('fill', hex);
+    document.getElementById('rhair').setAttribute('fill', hex);
+    document.getElementById('rtint').setAttribute('fill', hex);
+  }
+
+  function pickHs(el) {
+    document.querySelectorAll('.hs-item').forEach(s => s.classList.remove('on'));
+    el.classList.add('on');
+    document.getElementById('hair').setAttribute('d', el.dataset.d);
+    document.getElementById('rhair').setAttribute('d', el.dataset.d);
+  }
+
+  function go(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'generating') {
+      setTimeout(() => go('result'), 2200);
+    }
+  }
+
+  function toast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 20px;border-radius:24px;font-size:14px;z-index:99;';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1600);
+  }
+</script>
+</body>
+</html>
